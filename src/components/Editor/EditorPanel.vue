@@ -6,7 +6,7 @@ import { useDatabase } from '@/composables/useDatabase'
 
 const store = useAppStore()
 const editorContainer = ref<HTMLElement | null>(null)
-const { initEditor, setValue, setTheme, destroy } = useEditor(editorContainer, {
+const { initEditor, setValue, setTheme, destroy, vditor } = useEditor(editorContainer, {
   mode: 'wysiwyg',
   placeholder: 'Start writing...',
   onChange: (value) => {
@@ -34,16 +34,28 @@ watch(() => store.currentFileId, (newId, oldId) => {
     if (store.storageMode === 'sqlite') {
       const note = database.getNoteById(newId)
       if (note) {
-        if (!oldId) {
+        if (!oldId || !vditor.value) {
           initEditor(note.content, store.editorMode)
         } else {
           setValue(note.content)
         }
-      } else if (!oldId) {
-        initEditor('', store.editorMode)
+      } else {
+        if (!oldId || !vditor.value) {
+          initEditor('', store.editorMode)
+        } else {
+          setValue('')
+        }
       }
-    } else if (!oldId) {
-      initEditor('', store.editorMode)
+    } else {
+      if (!oldId || !vditor.value) {
+        initEditor('', store.editorMode)
+      } else {
+        setValue('')
+      }
+    }
+  } else {
+    if (oldId && vditor.value) {
+      setValue('')
     }
   }
 })
@@ -54,7 +66,16 @@ watch(() => store.theme, (newTheme) => {
 
 onMounted(() => {
   if (store.currentFileId) {
-    initEditor('', store.editorMode)
+    if (store.storageMode === 'sqlite') {
+      const note = database.getNoteById(store.currentFileId)
+      if (note) {
+        initEditor(note.content, store.editorMode)
+      } else {
+        initEditor('', store.editorMode)
+      }
+    } else {
+      initEditor('', store.editorMode)
+    }
   }
 })
 </script>
