@@ -12,7 +12,7 @@ const toggleTheme = () => {
   store.toggleTheme()
 }
 
-const switchMode = (mode: 'wysiwyg' | 'sv' | 'ir') => {
+const switchMode = (mode: 'wysiwyg' | 'sv' | 'ir' | 'source') => {
   store.setEditorMode(mode)
 }
 </script>
@@ -58,8 +58,8 @@ const switchMode = (mode: 'wysiwyg' | 'sv' | 'ir') => {
         </button>
         <button
           class="btn-mode"
-          :class="{ active: store.editorMode === 'ir' }"
-          @click="switchMode('ir')"
+          :class="{ active: store.editorMode === 'source' }"
+          @click="switchMode('source')"
           title="Source Mode"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

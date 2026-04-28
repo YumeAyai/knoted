@@ -29,16 +29,22 @@ const handleContentChange = (value: string) => {
   }, 1000)
 }
 
-watch(() => store.currentFileId, (newId) => {
+watch(() => store.currentFileId, (newId, oldId) => {
   if (newId) {
     if (store.storageMode === 'sqlite') {
       const note = database.getNoteById(newId)
       if (note) {
-        setValue(note.content)
+        if (!oldId) {
+          initEditor(note.content, store.editorMode)
+        } else {
+          setValue(note.content)
+        }
+      } else if (!oldId) {
+        initEditor('', store.editorMode)
       }
+    } else if (!oldId) {
+      initEditor('', store.editorMode)
     }
-  } else {
-    setValue('')
   }
 })
 
@@ -47,7 +53,9 @@ watch(() => store.theme, (newTheme) => {
 })
 
 onMounted(() => {
-  initEditor('', store.editorMode)
+  if (store.currentFileId) {
+    initEditor('', store.editorMode)
+  }
 })
 </script>
 
@@ -102,6 +110,7 @@ onMounted(() => {
 .editor-container {
   flex: 1;
   overflow: hidden;
+  min-width: 300px;
 }
 
 .editor-container.hidden {
@@ -115,5 +124,10 @@ onMounted(() => {
 
 .editor-container :deep(.vditor-content) {
   height: 100%;
+}
+
+.editor-container :deep(.vditor-sv),
+.editor-container :deep(.vditor-preview) {
+  min-width: 200px;
 }
 </style>

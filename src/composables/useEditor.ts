@@ -35,9 +35,12 @@ export function useEditor(
       vditor.value = null
     }
 
+    const isSourceMode = mode === 'source'
+    const vditorMode = isSourceMode ? 'sv' : mode
+
     vditor.value = new Vditor(container.value, {
       value: initialValue,
-      mode: mode,
+      mode: vditorMode,
       placeholder: options.placeholder || 'Start writing...',
       cache: {
         enable: false
@@ -45,6 +48,10 @@ export function useEditor(
       toolbarConfig: {
         pin: true,
       },
+      preview: {
+        mode: isSourceMode ? 'editor' : 'both'
+      },
+      customWysiwygToolbar: () => {},
       input: (value) => {
         content.value = value
         updateStats(value)
