@@ -80,11 +80,11 @@ onMounted(() => {
 <style scoped>
 .editor-wrapper {
   flex: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   background: var(--color-background);
-  min-width: 300px;
 }
 
 .editor-placeholder {
@@ -110,8 +110,8 @@ onMounted(() => {
 
 .editor-container {
   flex: 1;
+  width: 100%;
   overflow: hidden;
-  min-width: 300px;
 }
 
 .editor-container.hidden {
@@ -122,16 +122,15 @@ onMounted(() => {
   height: 100%;
   width: 100%;
   border: none;
-  min-width: 300px;
 }
 
 .editor-container :deep(.vditor-content) {
   height: 100%;
-  min-width: 300px;
+  width: 100%;
 }
 
 .editor-container :deep(.vditor-sv),
 .editor-container :deep(.vditor-preview) {
-  min-width: 200px;
+  width: 100%;
 }
 </style>
