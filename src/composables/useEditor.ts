@@ -69,9 +69,10 @@ export function useEditor(
         updateStats(value)
         options.onChange?.(value)
       },
-      blur: (value) => {
-        content.value = value
-        options.onChange?.(value, true)
+      blur: () => {
+        const currentValue = getValue()
+        content.value = currentValue
+        options.onChange?.(currentValue, true)
       },
     })
 
@@ -99,9 +100,8 @@ export function useEditor(
 
   const setMode = (mode: EditorMode) => {
     if (!vditor.value) return
-    
-    const vditorMode = mode === 'source' ? 'sv' : mode
-    ;(vditor.value as unknown as { setMode: (mode: string) => void }).setMode(vditorMode)
+    const currentValue = getValue()
+    initEditor(currentValue, mode)
   }
 
   const focus = () => {
