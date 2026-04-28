@@ -1,47 +1,57 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { onMounted, watch } from 'vue'
+import { useAppStore } from '@/stores/app'
+import Toolbar from '@/components/Toolbar/Toolbar.vue'
+import Sidebar from '@/components/Sidebar/Sidebar.vue'
+import EditorPanel from '@/components/Editor/EditorPanel.vue'
+import StatusBar from '@/components/StatusBar/StatusBar.vue'
+
+const store = useAppStore()
+
+// Apply theme on mount
+onMounted(() => {
+  document.documentElement.setAttribute('data-theme', store.theme)
+})
+
+// Watch theme changes
+watch(() => store.theme, (newTheme) => {
+  document.documentElement.setAttribute('data-theme', newTheme)
+})
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+  <div class="app">
+    <Toolbar />
+    <div class="app-body">
+      <Sidebar />
+      <main class="app-main">
+        <EditorPanel />
+      </main>
     </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+    <StatusBar />
+  </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
+<style>
+@import '@/styles/variables.css';
+
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-background);
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+.app-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 </style>
