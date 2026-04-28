@@ -84,6 +84,7 @@ onMounted(() => {
   flex-direction: column;
   overflow: hidden;
   background: var(--color-background);
+  min-width: 300px;
 }
 
 .editor-placeholder {
@@ -119,11 +120,14 @@ onMounted(() => {
 
 .editor-container :deep(.vditor) {
   height: 100%;
+  width: 100%;
   border: none;
+  min-width: 300px;
 }
 
 .editor-container :deep(.vditor-content) {
   height: 100%;
+  min-width: 300px;
 }
 
 .editor-container :deep(.vditor-sv),
