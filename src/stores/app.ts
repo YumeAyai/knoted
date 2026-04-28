@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 export type StorageMode = 'folder' | 'sqlite'
 export type EditorMode = 'wysiwyg' | 'sv' | 'ir' | 'source'
@@ -24,10 +24,34 @@ export interface Note {
   parentId: string | null
 }
 
+const STORAGE_KEY = 'knoted-app-settings'
+
+const loadSettings = () => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) {
+      return JSON.parse(saved)
+    }
+  } catch (e) {
+    console.error('Failed to load settings:', e)
+  }
+  return null
+}
+
+const saveSettings = (settings: Record<string, unknown>) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
+  } catch (e) {
+    console.error('Failed to save settings:', e)
+  }
+}
+
 export const useAppStore = defineStore('app', () => {
-  const theme = ref<'light' | 'dark'>('light')
-  const storageMode = ref<StorageMode>('folder')
-  const editorMode = ref<EditorMode>('wysiwyg')
+  const savedSettings = loadSettings()
+  
+  const theme = ref<'light' | 'dark'>(savedSettings?.theme ?? 'dark')
+  const storageMode = ref<StorageMode>(savedSettings?.storageMode ?? 'sqlite')
+  const editorMode = ref<EditorMode>(savedSettings?.editorMode ?? 'sv')
   const currentFileId = ref<string | null>(null)
   const fileTree = ref<FileNode[]>([])
   const notes = ref<Note[]>([])
@@ -75,6 +99,14 @@ export const useAppStore = defineStore('app', () => {
   function toggleSidebar() {
     sidebarCollapsed.value = !sidebarCollapsed.value
   }
+
+  watch([theme, storageMode, editorMode], () => {
+    saveSettings({
+      theme: theme.value,
+      storageMode: storageMode.value,
+      editorMode: editorMode.value,
+    })
+  })
 
   return {
     theme,
