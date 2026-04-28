@@ -6,7 +6,7 @@ import { useAppStore, type EditorMode } from '@/stores/app'
 interface UseEditorOptions {
   mode?: EditorMode
   placeholder?: string
-  onChange?: (value: string) => void
+  onChange?: (value: string, isBlur?: boolean) => void
 }
 
 export function useEditor(
@@ -21,8 +21,20 @@ export function useEditor(
 
   const updateStats = (value?: string) => {
     const contentValue = value ?? getValue()
-    const words = contentValue.trim().split(/\s+/).filter(w => w.length > 0)
-    wordCount.value = words.length
+    
+    const cjkPattern = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/
+    const hasCJK = cjkPattern.test(contentValue)
+    
+    let wordCountValue: number
+    if (hasCJK) {
+      const nonWhitespace = contentValue.replace(/\s+/g, '')
+      wordCountValue = nonWhitespace.length
+    } else {
+      const words = contentValue.trim().split(/\s+/).filter(w => w.length > 0)
+      wordCountValue = words.length
+    }
+    
+    wordCount.value = wordCountValue
     charCount.value = contentValue.length
     store.setEditorStats(wordCount.value, charCount.value)
   }
@@ -59,6 +71,7 @@ export function useEditor(
       },
       blur: (value) => {
         content.value = value
+        options.onChange?.(value, true)
       },
     })
 
@@ -86,8 +99,9 @@ export function useEditor(
 
   const setMode = (mode: EditorMode) => {
     if (!vditor.value) return
-    const currentValue = getValue()
-    initEditor(currentValue, mode)
+    
+    const vditorMode = mode === 'source' ? 'sv' : mode
+    ;(vditor.value as unknown as { setMode: (mode: string) => void }).setMode(vditorMode)
   }
 
   const focus = () => {

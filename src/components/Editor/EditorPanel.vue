@@ -6,11 +6,11 @@ import { useDatabase } from '@/composables/useDatabase'
 
 const store = useAppStore()
 const editorContainer = ref<HTMLElement | null>(null)
-const { initEditor, setValue, setTheme, destroy, vditor } = useEditor(editorContainer, {
+const { initEditor, setValue, setTheme, destroy, vditor, getValue } = useEditor(editorContainer, {
   mode: 'wysiwyg',
   placeholder: 'Start writing...',
-  onChange: (value) => {
-    handleContentChange(value)
+  onChange: (value, isBlur = false) => {
+    handleContentChange(value, isBlur)
   }
 })
 
@@ -18,18 +18,37 @@ const database = useDatabase()
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null
 
-const handleContentChange = (value: string) => {
-  if (!store.currentFileId) return
+const saveContent = (value: string, fileId: string) => {
+  if (store.storageMode === 'sqlite' && fileId) {
+    database.updateNote(fileId, { content: value })
+  }
+}
+
+const handleContentChange = (value: string, isBlur = false) => {
+  const currentFileId = store.currentFileId
+  if (!currentFileId) return
 
   if (saveTimer) clearTimeout(saveTimer)
-  saveTimer = setTimeout(() => {
-    if (store.storageMode === 'sqlite' && store.currentFileId) {
-      database.updateNote(store.currentFileId, { content: value })
-    }
-  }, 1000)
+  
+  if (isBlur) {
+    saveContent(value, currentFileId)
+  } else {
+    saveTimer = setTimeout(() => {
+      saveContent(value, currentFileId)
+    }, 1000)
+  }
 }
 
 watch(() => store.currentFileId, (newId, oldId) => {
+  if (oldId && vditor.value) {
+    if (saveTimer) {
+      clearTimeout(saveTimer)
+      saveTimer = null
+    }
+    const currentValue = getValue()
+    saveContent(currentValue, oldId)
+  }
+
   if (newId) {
     if (store.storageMode === 'sqlite') {
       const note = database.getNoteById(newId)

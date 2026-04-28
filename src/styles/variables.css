@@ -130,10 +130,16 @@ input:focus, textarea:focus {
 .vditor-toolbar {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
+  padding: 4px 8px;
+}
+
+.vditor-wysiwyg .vditor-toolbar {
+  padding: 4px 8px;
 }
 
 .vditor-toolbar .vditor-tooltipped {
   color: var(--color-text);
+  padding: 4px 6px;
 }
 
 .vditor-toolbar .vditor-tooltipped:hover {
