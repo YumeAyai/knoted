@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 export type StorageMode = 'folder' | 'sqlite'
-export type EditorMode = 'wysiwyg' | 'sv' | 'ir'
+export type EditorMode = 'wysiwyg' | 'sv' | 'ir' | 'source'
 
 export interface FileNode {
   id: string
