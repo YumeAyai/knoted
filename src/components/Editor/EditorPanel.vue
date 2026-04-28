@@ -9,8 +9,8 @@ const editorContainer = ref<HTMLElement | null>(null)
 const { initEditor, setValue, setTheme, destroy, vditor, getValue } = useEditor(editorContainer, {
   mode: 'wysiwyg',
   placeholder: 'Start writing...',
-  onChange: (value, isBlur = false) => {
-    handleContentChange(value, isBlur)
+  onChange: (value) => {
+    handleContentChange(value)
   }
 })
 
@@ -24,19 +24,15 @@ const saveContent = (value: string, fileId: string) => {
   }
 }
 
-const handleContentChange = (value: string, isBlur = false) => {
+const handleContentChange = (value: string) => {
   const currentFileId = store.currentFileId
   if (!currentFileId) return
 
   if (saveTimer) clearTimeout(saveTimer)
   
-  if (isBlur) {
+  saveTimer = setTimeout(() => {
     saveContent(value, currentFileId)
-  } else {
-    saveTimer = setTimeout(() => {
-      saveContent(value, currentFileId)
-    }, 1000)
-  }
+  }, 1000)
 }
 
 watch(() => store.currentFileId, (newId, oldId) => {

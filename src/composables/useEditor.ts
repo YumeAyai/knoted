@@ -69,10 +69,8 @@ export function useEditor(
         updateStats(value)
         options.onChange?.(value)
       },
-      blur: () => {
-        const currentValue = getValue()
-        content.value = currentValue
-        options.onChange?.(currentValue, true)
+      blur: (value) => {
+        content.value = value
       },
     })
 
